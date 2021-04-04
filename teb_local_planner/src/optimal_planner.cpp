@@ -142,26 +142,25 @@ void TebOptimalPlanner::visualize()
 void TebOptimalPlanner::registerG2OTypes()
 {
   g2o::Factory* factory = g2o::Factory::instance();
-  factory->registerType("VERTEX_POSE", new g2o::HyperGraphElementCreator<VertexPose>);
-  factory->registerType("VERTEX_TIMEDIFF", new g2o::HyperGraphElementCreator<VertexTimeDiff>);
-
-  factory->registerType("EDGE_TIME_OPTIMAL", new g2o::HyperGraphElementCreator<EdgeTimeOptimal>);
-  factory->registerType("EDGE_SHORTEST_PATH", new g2o::HyperGraphElementCreator<EdgeShortestPath>);
-  factory->registerType("EDGE_VELOCITY", new g2o::HyperGraphElementCreator<EdgeVelocity>);
-  factory->registerType("EDGE_VELOCITY_HOLONOMIC", new g2o::HyperGraphElementCreator<EdgeVelocityHolonomic>);
-  factory->registerType("EDGE_ACCELERATION", new g2o::HyperGraphElementCreator<EdgeAcceleration>);
-  factory->registerType("EDGE_ACCELERATION_START", new g2o::HyperGraphElementCreator<EdgeAccelerationStart>);
-  factory->registerType("EDGE_ACCELERATION_GOAL", new g2o::HyperGraphElementCreator<EdgeAccelerationGoal>);
-  factory->registerType("EDGE_ACCELERATION_HOLONOMIC", new g2o::HyperGraphElementCreator<EdgeAccelerationHolonomic>);
-  factory->registerType("EDGE_ACCELERATION_HOLONOMIC_START", new g2o::HyperGraphElementCreator<EdgeAccelerationHolonomicStart>);
-  factory->registerType("EDGE_ACCELERATION_HOLONOMIC_GOAL", new g2o::HyperGraphElementCreator<EdgeAccelerationHolonomicGoal>);
-  factory->registerType("EDGE_KINEMATICS_DIFF_DRIVE", new g2o::HyperGraphElementCreator<EdgeKinematicsDiffDrive>);
-  factory->registerType("EDGE_KINEMATICS_CARLIKE", new g2o::HyperGraphElementCreator<EdgeKinematicsCarlike>);
-  factory->registerType("EDGE_OBSTACLE", new g2o::HyperGraphElementCreator<EdgeObstacle>);
-  factory->registerType("EDGE_INFLATED_OBSTACLE", new g2o::HyperGraphElementCreator<EdgeInflatedObstacle>);
-  factory->registerType("EDGE_DYNAMIC_OBSTACLE", new g2o::HyperGraphElementCreator<EdgeDynamicObstacle>);
-  factory->registerType("EDGE_VIA_POINT", new g2o::HyperGraphElementCreator<EdgeViaPoint>);
-  factory->registerType("EDGE_PREFER_ROTDIR", new g2o::HyperGraphElementCreator<EdgePreferRotDir>);
+  factory->registerType("VERTEX_POSE", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<VertexPose>));
+  factory->registerType("VERTEX_TIMEDIFF", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<VertexTimeDiff>));
+  factory->registerType("EDGE_TIME_OPTIMAL", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeTimeOptimal>));
+  factory->registerType("EDGE_SHORTEST_PATH", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeShortestPath>));
+  factory->registerType("EDGE_VELOCITY", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeVelocity>));
+  factory->registerType("EDGE_VELOCITY_HOLONOMIC", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeVelocityHolonomic>));
+  factory->registerType("EDGE_ACCELERATION", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeAcceleration>));
+  factory->registerType("EDGE_ACCELERATION_START", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeAccelerationStart>));
+  factory->registerType("EDGE_ACCELERATION_GOAL", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeAccelerationGoal>));
+  factory->registerType("EDGE_ACCELERATION_HOLONOMIC", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeAccelerationHolonomic>));
+  factory->registerType("EDGE_ACCELERATION_HOLONOMIC_START", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeAccelerationHolonomicStart>));
+  factory->registerType("EDGE_ACCELERATION_HOLONOMIC_GOAL", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeAccelerationHolonomicGoal>));
+  factory->registerType("EDGE_KINEMATICS_DIFF_DRIVE", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeKinematicsDiffDrive>));
+  factory->registerType("EDGE_KINEMATICS_CARLIKE", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeKinematicsCarlike>));
+  factory->registerType("EDGE_OBSTACLE", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeObstacle>));
+  factory->registerType("EDGE_INFLATED_OBSTACLE", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeInflatedObstacle>));
+  factory->registerType("EDGE_DYNAMIC_OBSTACLE", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeDynamicObstacle>));
+  factory->registerType("EDGE_VIA_POINT", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgeViaPoint>));
+  factory->registerType("EDGE_PREFER_ROTDIR", std::shared_ptr<g2o::AbstractHyperGraphElementCreator>(new g2o::HyperGraphElementCreator<EdgePreferRotDir>));
   return;
 }
 
