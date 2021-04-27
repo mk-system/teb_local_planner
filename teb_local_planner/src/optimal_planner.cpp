@@ -938,7 +938,7 @@ void TebOptimalPlanner::AddEdgesJerk()
       acceleration_edge->setVertex(1,teb_.PoseVertex(n-2));
       acceleration_edge->setVertex(2,teb_.PoseVertex(n-1));
       acceleration_edge->setVertex(3,teb_.TimeDiffVertex( teb_.sizeTimeDiffs()-2 ));
-      acceleration_edge->setVertex(3,teb_.TimeDiffVertex( teb_.sizeTimeDiffs()-1 ));
+      acceleration_edge->setVertex(4,teb_.TimeDiffVertex( teb_.sizeTimeDiffs()-1 ));
       acceleration_edge->setGoalVelocity(vel_goal_.second);
       acceleration_edge->setInformation(information);
       acceleration_edge->setTebConfig(*cfg_);
