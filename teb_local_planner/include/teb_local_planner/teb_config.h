@@ -59,7 +59,7 @@ class TebConfig
 {
 public:
   using UniquePtr = std::unique_ptr<TebConfig>;
-  
+
   std::string odom_topic; //!< Topic name of the odometry message, provided by the robot driver or simulator
   std::string map_frame; //!< Global planning frame
   std::string node_name; //!< node name used for parameter event callback
@@ -102,6 +102,8 @@ public:
     double acc_lim_x; //!< Maximum translational acceleration of the robot
     double acc_lim_y; //!< Maximum strafing acceleration of the robot
     double acc_lim_theta; //!< Maximum angular acceleration of the robot
+    double jerk_lim_x; //!<Maximum traslational jerk of the robot
+    double jerk_lim_theta;//!<Maximum angular jerk of the robot
     double min_turning_radius; //!< Minimum turning radius of a carlike robot (diff-drive robot: zero);
     double wheelbase; //!< The distance between the drive shaft and steering axle (only required for a carlike robot with 'cmd_angle_instead_rotvel' enabled); The value might be negative for back-wheeled robots!
     bool cmd_angle_instead_rotvel; //!< Substitute the rotational velocity in the commanded velocity message by the corresponding steering angle (check 'axles_distance')
@@ -156,6 +158,8 @@ public:
     double weight_acc_lim_x; //!< Optimization weight for satisfying the maximum allowed translational acceleration
     double weight_acc_lim_y; //!< Optimization weight for satisfying the maximum allowed strafing acceleration (in use only for holonomic robots)
     double weight_acc_lim_theta; //!< Optimization weight for satisfying the maximum allowed angular acceleration
+    double weight_jerk_lim_x;//!< Optimization weight for satisfying the maximum allowed translational jerk
+    double weight_jerk_lim_theta;//!< Optimization weight for satisfying the maximum allowed angular jerk
     double weight_kinematics_nh; //!< Optimization weight for satisfying the non-holonomic kinematics
     double weight_kinematics_forward_drive; //!< Optimization weight for forcing the robot to choose only forward directions (positive transl. velocities, only diffdrive robot)
     double weight_kinematics_turning_radius; //!< Optimization weight for enforcing a minimum turning radius (carlike robots)
@@ -263,7 +267,7 @@ public:
     trajectory.publish_feedback = false;
     trajectory.min_resolution_collision_check_angular = M_PI;
     trajectory.control_look_ahead_poses = 1;
-    
+
     // Robot
 
     robot.max_vel_x = 0.4;
@@ -277,6 +281,8 @@ public:
     robot.acc_lim_x = 0.5;
     robot.acc_lim_y = 0.5;
     robot.acc_lim_theta = 0.5;
+    robot.jerk_lim_x=0.5;
+    robot.jerk_lim_theta=0.5;
     robot.min_turning_radius = 0;
     robot.wheelbase = 1.0;
     robot.cmd_angle_instead_rotvel = false;
@@ -320,6 +326,8 @@ public:
     optim.weight_acc_lim_x = 1;
     optim.weight_acc_lim_y = 1;
     optim.weight_acc_lim_theta = 1;
+    optim.weight_jerk_lim_x=1;
+    optim.weight_jerk_lim_theta=1;
     optim.weight_kinematics_nh = 1000;
     optim.weight_kinematics_forward_drive = 1;
     optim.weight_kinematics_turning_radius = 1;
@@ -379,7 +387,7 @@ public:
     recovery.divergence_detection_enable = false;
     recovery.divergence_detection_max_chi_squared = 10;
   }
-  
+
   void declareParameters(const nav2_util::LifecycleNode::SharedPtr, const std::string name);
 
   /**
@@ -387,14 +395,14 @@ public:
    * @param nh const reference to the local rclcpp::Node::SharedPtr
    */
   void loadRosParamFromNodeHandle(const nav2_util::LifecycleNode::SharedPtr nh, const std::string name);
-  
+
   /**
    * @brief Paremeter event callback
    * @param event The ParameterEvent
    */
   void on_parameter_event_callback(
       const rcl_interfaces::msg::ParameterEvent::SharedPtr event);
-  
+
   /**
    * @brief Check parameters and print warnings in case of discrepancies
    *
@@ -402,13 +410,13 @@ public:
    * about some improper uses.
    */
   void checkParameters() const;
-  
+
   /**
    * @brief Check if some deprecated parameters are found and print warnings
    * @param nh const reference to the local rclcpp::Node::SharedPtr
    */
   void checkDeprecated(const nav2_util::LifecycleNode::SharedPtr nh, const std::string name) const;
-  
+
   /**
    * @brief Return the internal config mutex
    */
