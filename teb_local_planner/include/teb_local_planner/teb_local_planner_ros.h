@@ -74,7 +74,7 @@
 // dynamic reconfigure
 //#include "teb_local_planner/TebLocalPlannerReconfigureConfig.h>
 //#include <dynamic_reconfigure/server.h>
-
+#include <rcl_interfaces/msg/set_parameters_result.hpp>
 
 namespace teb_local_planner
 {
@@ -158,7 +158,13 @@ public:
    * @return Robot footprint model used for optimization
    */
   RobotFootprintModelPtr getRobotFootprintFromParamServer(nav2_util::LifecycleNode::SharedPtr node);
-  
+
+  /**
+   * @brief Callback executed when a paramter change is detected
+   * @param parameters list of changed parameters
+   */
+  rcl_interfaces::msg::SetParametersResult dynamicParametersCallback(std::vector<rclcpp::Parameter> parameters);
+
   /** 
    * @brief Set the footprint from the given XmlRpcValue.
    * @remarks This method is copied from costmap_2d/footprint.h, since it is not declared public in all ros distros
@@ -417,6 +423,13 @@ private:
   // Subscription for parameter change
   rclcpp::AsyncParametersClient::SharedPtr parameters_client_;
   rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameter_event_sub_;
+
+  // Dynamic parameters handler
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr dyn_params_handler_;
+
+  // Dynamic parameters
+  std::string dynamic_model_name_;
+  std::string dynamic_footprint_string_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

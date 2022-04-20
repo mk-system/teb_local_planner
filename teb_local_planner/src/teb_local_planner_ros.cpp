@@ -62,6 +62,7 @@
 #include <tf2_eigen/tf2_eigen.h>
 
 using nav2_util::declare_parameter_if_not_declared;
+using std::placeholders::_1;
 
 namespace teb_local_planner
 {
@@ -199,6 +200,13 @@ void TebLocalPlannerROS::initialize(nav2_util::LifecycleNode::SharedPtr node)
   else
   {
     RCLCPP_INFO(logger_, "teb_local_planner has already been initialized, doing nothing.");
+  }
+
+  if(cfg_->robot.is_footprint_dynamic)
+  {
+    // Add callback for dynamic parameters
+    dyn_params_handler_ = node->add_on_set_parameters_callback(
+      std::bind(&TebLocalPlannerROS::dynamicParametersCallback, this, _1));
   }
 }
 
@@ -1242,6 +1250,54 @@ RobotFootprintModelPtr TebLocalPlannerROS::getRobotFootprintFromParamServer(nav2
   return std::make_shared<PointRobotFootprint>();
 }
 
+rcl_interfaces::msg::SetParametersResult
+TebLocalPlannerROS::dynamicParametersCallback(std::vector<rclcpp::Parameter> parameters)
+{
+  rcl_interfaces::msg::SetParametersResult result;
+  RobotFootprintModelPtr robot_model = NULL;
+  for (auto & parameter : parameters) {
+    const auto & type = parameter.get_type();
+    const auto & name = parameter.get_name();
+    if (type == rcl_interfaces::msg::ParameterType::PARAMETER_STRING) {
+      if (name == name_ + "." + "footprint_model.type") {
+        RCLCPP_INFO(logger_, "Update %s: %s", name.c_str(), parameter.as_string().c_str());
+        dynamic_model_name_ = parameter.as_string();
+        dynamic_footprint_string_.clear();
+      } else if (name == name_ + "." + "footprint_model.vertices") {
+        RCLCPP_INFO(logger_, "Update %s: %s", name.c_str(), parameter.as_string().c_str());
+        dynamic_footprint_string_ = parameter.as_string();
+      }
+    }
+  }
+  if (dynamic_model_name_.compare("polygon") == 0 && !dynamic_footprint_string_.empty()) {
+    std::vector<geometry_msgs::msg::Point> footprint;
+    // get vertices
+    if (nav2_costmap_2d::makeFootprintFromString(dynamic_footprint_string_, footprint))
+    {
+      Point2dContainer polygon;
+      for(const auto &pt : footprint) {
+          polygon.push_back(Eigen::Vector2d(pt.x, pt.y));
+      }
+      std::string param_full_name = name_ + "." + "footprint_model.vertices";
+      RCLCPP_INFO(logger_, "%s = %s", param_full_name.c_str(), dynamic_footprint_string_.c_str());
+      RCLCPP_INFO(logger_, "Footprint model 'polygon' loaded for trajectory optimization.");
+      robot_model = std::make_shared<PolygonRobotFootprint>(polygon);
+    }
+    else
+    {
+      RCLCPP_ERROR(logger_,
+                "Footprint model 'polygon' cannot be loaded for trajectory optimization, since param '%s.footprint_model.vertices' does not define an array of coordinates. Using point-model instead.",
+                name_.c_str());
+    }
+  }
+  if (robot_model != NULL) {
+    RCLCPP_INFO(logger_, "Update robot model");
+    planner_->updateRobotModel(robot_model);
+  }
+  result.successful = true;
+  return result;
+}
+
 void TebLocalPlannerROS::activate() {
   visualization_->on_activate();
 
@@ -1249,6 +1305,10 @@ void TebLocalPlannerROS::activate() {
 }
 void TebLocalPlannerROS::deactivate() {
   visualization_->on_deactivate();
+  if(cfg_->robot.is_footprint_dynamic)
+  {
+    dyn_params_handler_.reset();
+  }
 
   return;
 }
