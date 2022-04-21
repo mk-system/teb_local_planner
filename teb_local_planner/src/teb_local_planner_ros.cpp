@@ -1278,21 +1278,23 @@ TebLocalPlannerROS::dynamicParametersCallback(std::vector<rclcpp::Parameter> par
       for(const auto &pt : footprint) {
           polygon.push_back(Eigen::Vector2d(pt.x, pt.y));
       }
-      std::string param_full_name = name_ + "." + "footprint_model.vertices";
-      RCLCPP_INFO(logger_, "%s = %s", param_full_name.c_str(), dynamic_footprint_string_.c_str());
       RCLCPP_INFO(logger_, "Footprint model 'polygon' loaded for trajectory optimization.");
       robot_model = std::make_shared<PolygonRobotFootprint>(polygon);
     }
     else
     {
+      std::string vertices_param_full_name = name_ + "." + "footprint_model.vertices";
       RCLCPP_ERROR(logger_,
-                "Footprint model 'polygon' cannot be loaded for trajectory optimization, since param '%s.footprint_model.vertices' does not define an array of coordinates. Using point-model instead.",
-                name_.c_str());
+                "Footprint model 'polygon' cannot be loaded for trajectory optimization, since param '%s' does not define an array of coordinates.",
+                vertices_param_full_name.c_str());
     }
   }
   if (robot_model != NULL) {
     RCLCPP_INFO(logger_, "Update robot model");
     planner_->updateRobotModel(robot_model);
+  }
+  else {
+    RCLCPP_ERROR(logger_, "No robot model updated");
   }
   result.successful = true;
   return result;
