@@ -1294,7 +1294,7 @@ TebLocalPlannerROS::dynamicParametersCallback(std::vector<rclcpp::Parameter> par
     planner_->updateRobotModel(robot_model);
   }
   else {
-    RCLCPP_ERROR(logger_, "No robot model updated");
+    RCLCPP_WARN(logger_, "No robot model updated");
   }
   result.successful = true;
   return result;
